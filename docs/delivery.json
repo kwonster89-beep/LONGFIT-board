@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-26",
+  "updated": "2026-11-26 17:52",
   "notice": "交货日期请每天核实,如所要求的订单交货日期发生变动,请务必告知EGOJIN,以便及时应对",
   "rows": [
     {
@@ -196,6 +196,17 @@
       "due": "27.02.10",
       "actual": "",
       "note": "刹车方式要改成 704W （往下压固定）",
+      "done": false,
+      "hl": false,
+      "images": []
+    },
+    {
+      "group": "704HR",
+      "product": "704HR",
+      "pi": "EG-704HR-007",
+      "due": "27.03.30",
+      "actual": "",
+      "note": "不要PU轮，木板用原生棉 35mm",
       "done": false,
       "hl": false,
       "images": []
@@ -513,6 +524,17 @@
       "product": "266R",
       "pi": "EG-266-017",
       "due": "26.12.13",
+      "actual": "",
+      "note": "",
+      "done": false,
+      "hl": false,
+      "images": []
+    },
+    {
+      "group": "266R",
+      "product": "266R",
+      "pi": "EG-266-018",
+      "due": "27.03.25",
       "actual": "",
       "note": "",
       "done": false,

@@ -290,10 +290,10 @@
 <div class="lb" id="lb"><img alt=""></div>
 
 <script>
-const TOKEN_KEY = 'kirunboard_token';   // 기존 mat-bundle 사이트와 같은 도메인이라 키 이름을 반드시 다르게 유지
+const TOKEN_KEY = 'lingfitboard_token';   // 기존 mat-bundle 사이트와 같은 도메인이라 키 이름을 반드시 다르게 유지
 const host = location.hostname, seg = location.pathname.split('/').filter(Boolean);
 const OWNER = host.endsWith('github.io') ? host.split('.')[0] : 'kwonster89-beep';
-const REPO  = host.endsWith('github.io') ? (seg[0] || OWNER + '.github.io') : 'kirun-board';
+const REPO  = host.endsWith('github.io') ? (seg[0] || OWNER + '.github.io') : 'LINGFIT-board';
 const DIR   = 'docs/';   // 저장소 안에서 사이트 파일이 있는 폴더 (GitHub Pages: main 브랜치 /docs)
 const IS_LOCAL = !host.endsWith('github.io');
 
@@ -582,7 +582,7 @@ function renderSpec(items, editing){
 // ---------- UI events ----------
 const segBind = (sel, fn) => $(sel).addEventListener('click', e=>{ const b=e.target.closest('button'); if(!b) return;
   [...$(sel).children].forEach(x=>x.classList.toggle('on', x===b)); fn(b.dataset.v); });
-segBind('#tabs', v=>{ document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on', s.id==='v-'+v)); document.body.dataset.tab = v; localStorage.setItem('kirunboard_tab', v); });
+segBind('#tabs', v=>{ document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on', s.id==='v-'+v)); document.body.dataset.tab = v; localStorage.setItem('lingfitboard_tab', v); });
 document.body.dataset.tab = 'delivery';
 segBind('#dfl', v=>{ dF=v; render(); }); segBind('#pfl', v=>{ pF=v; render(); }); segBind('#sfl', v=>{ sF=v; render(); });
 $('#qd').addEventListener('input', e=>{ qd=e.target.value; render(); });
@@ -594,11 +594,11 @@ $('#addP').addEventListener('click', ()=>addRow('pr'));
 $('#addS').addEventListener('click', ()=>addRow('sr'));
 segBind('#mat', v=>{ matF=v; render(); });
 segBind('#stf', v=>{ stF=v; render(); });
-segBind('#lang', v=>{ document.body.classList.remove('lang-both','lang-ko','lang-cn'); document.body.classList.add('lang-'+v); localStorage.setItem('kirunboard_lang', v); });
+segBind('#lang', v=>{ document.body.classList.remove('lang-both','lang-ko','lang-cn'); document.body.classList.add('lang-'+v); localStorage.setItem('lingfitboard_lang', v); });
 $('#q').addEventListener('input', e=>{ q=e.target.value; render(); });
 $('#q2').addEventListener('input', e=>{ q2=e.target.value; render(); });
-const savedLang = localStorage.getItem('kirunboard_lang'); if (savedLang) $(`#lang button[data-v="${savedLang}"]`)?.click();
-const savedTab = localStorage.getItem('kirunboard_tab'); if (savedTab) $(`#tabs button[data-v="${savedTab}"]`)?.click();
+const savedLang = localStorage.getItem('lingfitboard_lang'); if (savedLang) $(`#lang button[data-v="${savedLang}"]`)?.click();
+const savedTab = localStorage.getItem('lingfitboard_tab'); if (savedTab) $(`#tabs button[data-v="${savedTab}"]`)?.click();
 
 // ---------- edit mode (owner only) ----------
 function startEdit(){

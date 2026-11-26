@@ -1,0 +1,9 @@
+# 비밀 정보 (편집키/토큰) - 절대 올리지 않기
+.secrets/
+# 텐센트 문서 등에서 받은 원본 엑셀
+import/*.xlsx
+*.xlsx
+~$*
+node_modules/
+.DS_Store
+Thumbs.db

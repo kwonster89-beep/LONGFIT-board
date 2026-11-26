@@ -1,12 +1,12 @@
-# 키룬 관리표 (LINGFIT-board) - Claude Code 작업 안내
+# 키룬 관리표 (LONGFIT-board) - Claude Code 작업 안내
 
 이 파일은 Claude Code가 이 프로젝트에서 일할 때 먼저 읽는 안내서예요. **답변과 설명은 항상 한국어로**, 사용자는 개발자가 아니므로 쉬운 말로 설명해 주세요.
 
 ## 무엇인가
 - 무역팀(권성택)이 키룬 공장(厦门云中飞, Xiamen Yunzhongfei)과 공유하는 관리표 웹사이트.
 - 예전에 텐센트 문서(腾讯文档) "EGOJIN_키룬云中飞 管理表格"에서 쓰던 표를 옮겨온 것.
-- 주소: https://kwonster89-beep.github.io/LINGFIT-board/  (GitHub Pages, main 브랜치의 `/docs` 폴더)
-- 저장소: https://github.com/kwonster89-beep/LINGFIT-board (공개 저장소. 검색엔진 차단(noindex)만 되어 있음)
+- 주소: https://kwonster89-beep.github.io/LONGFIT-board/  (GitHub Pages, main 브랜치의 `/docs` 폴더)
+- 저장소: https://github.com/kwonster89-beep/LONGFIT-board (공개 저장소. 검색엔진 차단(noindex)만 되어 있음)
 - 서버·DB 없음. `docs/index.html` 한 파일(HTML+CSS+순수 JavaScript)이 `docs/*.json`을 읽어서 표를 그림.
 - 참고: 같은 내용의 이전 버전 사이트 `kwonster89-beep/mat-bundle`이 따로 있음. **그 저장소는 절대 건드리지 말 것.**
 
@@ -44,7 +44,7 @@ tools/
 - 표 데이터 자체(상품명, 비고 등)는 공장과 같이 보므로 중국어 원문 그대로 둠.
 - 기본 색/스타일은 index.html 상단 CSS 변수 사용. 이모지 쓰지 않기.
 - 휴대폰에서도 보이게: 표는 `.tablebox` 안에서 가로 스크롤.
-- localStorage 키는 `lingfitboard_*` 사용 (mat-bundle 사이트와 같은 도메인이라 `matsite_*`를 쓰면 서로 꼬임).
+- localStorage 키는 `longfitboard_*` 사용 (mat-bundle 사이트와 같은 도메인이라 `matsite_*`를 쓰면 서로 꼬임).
 
 ## 편집 방식 (두 가지)
 1. **사이트에서 직접 편집**: 사장님 브라우저에만 편집키가 저장되어 있어서 "✎ 편집" 버튼이 보임 → 수정 → 저장하면 GitHub API로 docs/*.json이 바로 바뀜. 사진도 편집 모드에서 업로드(docs/img/u-*.jpg).

@@ -87,7 +87,7 @@ switch ($Action) {
       Invoke-WebRequest -Uri "$Api/git/blobs/$($x.RemoteSha)" -Headers $rh -OutFile $dest -UseBasicParsing
       Write-Host "받음: $($x.Path)"; $n++
     }
-    Write-Host "데이터 받기 완료: $n개 파일"
+    Write-Host "데이터 받기 완료: $($n)개 파일"
   }
   'push' {
     $n = 0
@@ -101,6 +101,6 @@ switch ($Action) {
       Invoke-RestMethod -Method Put -Uri "$Api/contents/$($x.Path)" -Headers $H -ContentType 'application/json; charset=utf-8' -Body ([Text.Encoding]::UTF8.GetBytes($json)) | Out-Null
       Write-Host "올림: $($x.Path)"; $n++
     }
-    Write-Host "배포 완료: $n개 파일. 1~2분 뒤 https://$Owner.github.io/$Repo/ 에 반영돼요."
+    Write-Host "배포 완료: $($n)개 파일. 1~2분 뒤 https://$Owner.github.io/$Repo/ 에 반영돼요."
   }
 }

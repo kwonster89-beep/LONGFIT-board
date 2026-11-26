@@ -89,6 +89,34 @@
   .notice:empty{display:none}
   td.late{color:var(--red);font-weight:700}
   .late-tag{font-size:11px;color:var(--red)}
+/* 납기표 A안 (깔끔 정리형) */
+body.editing .view-only{display:none}
+th.dA-l{text-align:left}
+#tb-d.dA td{text-align:left;padding:10px 14px;border-bottom:1px solid #eef1f5}
+#tb-d.dA td.num{font-variant-numeric:tabular-nums}
+#tb-d.dA tr.grpA td{background:#fafbfd;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:12px 14px}
+#tb-d.dA tr.grpA b{font-size:15px;color:var(--text)}
+#tb-d.dA tr.grpA .cnt{margin-left:8px;color:var(--sub);font-size:12px}
+#tb-d.dA tr.grpA .sum{float:right;font-size:12px;color:var(--sub)}
+#tb-d.dA tr.grpA .sum>span{margin-left:12px}
+#tb-d.dA tr.grpA .sum .r{color:var(--red);font-weight:700}
+#tb-d.dA tr.lateA td:first-child{box-shadow:inset 3px 0 0 var(--red)}
+#tb-d.dA .cn{display:inline;margin:0 0 0 3px}
+#tb-d.dA td.note .cn{display:inline}
+.dA .pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}
+.dA .pill .cn{font-weight:400;opacity:.85;color:inherit;font-size:12px}
+.dA .pill.late{background:#fde8e8;color:var(--red)}
+.dA .pill.ok{background:#e8eef8;color:var(--brand)}
+.dA .pill.early{background:#e6f4e7;color:#2e7d32}
+.dA .pill.tbd{background:#f0f2f5;color:#8592a0}
+.dA .pill.memo,.dA .pill.over{background:#fff4d6;color:#8a6d1a}
+.dA .pill.done{background:#eef6ee;color:#2e7d32}
+.dA .diff{color:var(--red);font-size:12px;font-weight:700;margin-left:6px;white-space:nowrap}
+.dA .diff.e{color:#2e7d32}
+.dA .dash{color:#b3bcc6}
+body.lang-both #tb-d.dA .diff .cn{display:none}
+body.lang-cn #tb-d.dA .cn{margin:0}
+body.lang-cn .dA .pill .cn{font-weight:700;opacity:1}
   .komemo{margin-top:4px;color:var(--brand);font-size:12px}
   img.thumb{width:64px;height:64px;object-fit:cover;border-radius:6px;border:1px solid var(--line);margin:4px 4px 0 0;cursor:zoom-in;vertical-align:top;background:#f0f3f8}
   .imgs{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;align-items:flex-start}
@@ -144,14 +172,15 @@
     </div>
     <div class="tablebox"><table class="wide">
       <thead><tr>
-        <th style="text-align:left"><span class="ko">상품</span><span class="cn">产品名</span></th>
-        <th>PI <span class="cn">订单号</span></th>
-        <th><span class="ko">요청 납기</span><span class="cn">交期</span></th>
-        <th><span class="ko">공장 실제 납기</span><span class="cn">云中飞实际交期</span></th>
+        <th class="edit-only" style="text-align:left"><span class="ko">상품</span><span class="cn">产品名</span></th>
+        <th class="dA-l" style="width:200px">PI <span class="cn">订单号</span></th>
+        <th class="dA-l view-only" style="width:150px"><span class="ko">상태</span><span class="cn">状态</span></th>
+        <th class="dA-l" style="width:130px"><span class="ko">요청 납기</span><span class="cn">交期</span></th>
+        <th class="dA-l" style="width:210px"><span class="ko">공장 실제 납기</span><span class="cn">云中飞实际交期</span></th>
         <th style="text-align:left"><span class="ko">비고</span><span class="cn">备注</span></th>
         <th class="edit-only"></th>
       </tr></thead>
-      <tbody id="tb-d"></tbody>
+      <tbody id="tb-d" class="dA"></tbody>
     </table></div>
     <h2>설 전 출고 계획 <span class="cn">年前出货计划</span> <button class="btn edit-only" id="addPlan" style="margin-left:8px">+ 추가</button></h2>
     <div class="tablebox"><table class="wide">
@@ -419,16 +448,35 @@ function renderDelivery(editing){
   $('#d-notice').innerHTML = ml(d.notice||'');
   const rows = d.rows.map((x,i)=>({x,i})).filter(({x}) => editing || ((dF==='all' || !x.done) && match(qd, [x.group,x.product,x.pi,x.due,x.actual,x.note])));
   let html = '', g = null;
+  const toDt = s => { const n = normD(s); if (!n) return null; const [y,m,dd] = n.split('.').map(Number); return new Date(2000+y, m-1, dd); };
+  const tdy = toDt(todayYY);
+  const stOf = x => {
+    if (x.done) return {k:'done', ko:'완료', cn:'已完成'};
+    const due = toDt(x.due), act = toDt(x.actual);
+    if (act && due){ const df = Math.round((act-due)/86400000);
+      if (df > 0) return {k:'late', ko:'지연', cn:'延迟', d:df};
+      if (df < 0) return {k:'early', ko:'조기', cn:'提前', d:df};
+      return {k:'ok', ko:'확정', cn:'已确认', d:0}; }
+    if (act) return {k:'ok', ko:'확정', cn:'已确认'};
+    if (String(x.actual||'').trim()) return {k:'memo', ko:'확인 필요', cn:'待确认'};
+    if (due && tdy && due < tdy) return {k:'over', ko:'납기 경과', cn:'已过交期'};
+    return {k:'tbd', ko:'미회신', cn:'待回复'};
+  };
+  const bi = (ko, cn) => `<span class="ko">${ko}</span><span class="cn">${cn}</span>`;
+  const grpSum = {};
+  if (!editing) for (const {x} of rows){ const s = stOf(x), o = grpSum[x.group] || (grpSum[x.group] = {n:0, late:0, ok:0, tbd:0}); o.n++; if (s.k==='late') o.late++; else if (s.k==='ok'||s.k==='early') o.ok++; else if (s.k==='tbd') o.tbd++; }
   for (const {x,i} of rows){
-    if (!editing && x.group !== g){ g = x.group; html += `<tr class="grp"><td colspan="6">${esc(g||'-')}</td></tr>`; }
+    if (!editing && x.group !== g){ g = x.group; const o = grpSum[g];
+      html += `<tr class="grpA"><td colspan="7"><b>${esc(g||'-')}</b><span class="cnt">${o.n}${bi('건','个')}</span><span class="sum">${o.late?`<span class="r">${bi('지연','延迟')} ${o.late}</span>`:''}<span>${bi('확정','已确认')} ${o.ok}</span><span>${bi('미회신','待回复')} ${o.tbd}</span></span></td></tr>`; }
     if (editing){ html += `<tr data-t="dr" data-i="${i}">
       <td>${inp('group', x.group, '그룹(예: 704W 蓝牙)')}${inp('product', x.product, '상품')}</td><td>${inp('pi', x.pi, 'EG-...')}</td>
       <td>${inp('due', x.due, '26.12.31')}</td><td>${ta('actual', x.actual)}</td><td>${ta('note', x.note)}${editImgs(x.images,'dr',i)}</td>
       <td>${doneBox(x.done)}${delBtn('dr',i)}</td></tr>`; continue; }
-    const late = normD(x.due) && normD(x.actual) && normD(x.actual) > normD(x.due);
-    html += `<tr class="${x.done?'muted':''}">
-      <td class="name">${esc(x.product)}</td><td class="code">${esc(x.pi)}</td><td>${esc(x.due)}</td>
-      <td class="${late?'late':''}">${ml(x.actual)}${late?'<div class="late-tag"><span class="ko">요청 납기보다 늦음</span><span class="cn">晚于交期</span></div>':''}${x.done?DONE_B:''}</td>
+    const s = stOf(x);
+    const diff = s.k==='late' ? `<span class="diff">+${s.d}${bi('일','天')}</span>` : s.k==='early' ? `<span class="diff e">${s.d}${bi('일','天')}</span>` : '';
+    html += `<tr class="${x.done?'muted':''} ${s.k==='late'?'lateA':''}">
+      <td class="edit-only"></td><td class="code">${esc(x.pi)}</td><td><span class="pill ${s.k}">${bi(s.ko, s.cn)}</span></td><td class="num">${esc(x.due)}</td>
+      <td class="num">${String(x.actual||'').trim() ? ml(x.actual) : '<span class="dash">—</span>'}${diff}</td>
       <td class="note ${x.hl?'hl':''}">${ml(x.note)}${thumbs(x.images)}</td><td class="edit-only"></td></tr>`;
   }
   $('#tb-d').innerHTML = html || EMPTY(6);

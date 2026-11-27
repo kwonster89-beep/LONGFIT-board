@@ -128,7 +128,9 @@ body.lang-cn .dA .pill .cn{font-weight:700;opacity:1}
   .donebox{display:block;font-size:12px;white-space:nowrap;margin-bottom:6px} .donebox input{width:auto}
   .lb{position:fixed;inset:0;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center;z-index:20;cursor:zoom-out}
   .lb.on{display:flex} .lb img{max-width:94vw;max-height:92vh;border-radius:6px;background:#fff}
-  body:not([data-tab="stock"]) #syncBtn{display:none!important}
+  body:not([data-tab="stock"]):not([data-tab="delivery"]) #syncBtn{display:none!important}
+#syncBtn .lb-d{display:none} body[data-tab="delivery"] #syncBtn .lb-d{display:inline} body[data-tab="delivery"] #syncBtn .lb-s{display:none}
+.dsync{font-size:12px;color:var(--sub);white-space:nowrap}
   @media (max-width:700px){ .stock{grid-template-columns:1fr} h1{font-size:18px} h1 small{display:block;margin:2px 0 0} .stat .v{font-size:18px} }
 </style>
 </head>
@@ -154,7 +156,7 @@ body.lang-cn .dA .pill .cn{font-weight:700;opacity:1}
   </div>
 
   <div class="toolbar">
-    <button class="btn primary owner-only" id="syncBtn" style="display:none">무역허브에서 PI 갱신</button>
+    <button class="btn primary owner-only" id="syncBtn" style="display:none"><span class="lb-s">무역허브에서 PI 갱신</span><span class="lb-d">무역허브에서 납기 갱신</span></button>
     <button class="btn owner-only" id="editBtn" style="display:none">✎ 편집</button>
     <span style="flex:1"></span>
     <div class="seg" id="lang">
@@ -169,6 +171,7 @@ body.lang-cn .dA .pill .cn{font-weight:700;opacity:1}
       <input class="search" id="qd" placeholder="상품·PI 검색 / 搜索产品·订单号">
       <div class="seg" id="dfl"><button data-v="open" class="on">진행 중 进行中</button><button data-v="all">전체(완료 포함) 全部</button></div>
       <button class="btn edit-only" id="addD">+ 행 추가</button>
+      <span class="dsync" id="d-synced"></span>
     </div>
     <div class="tablebox"><table class="wide">
       <thead><tr>
@@ -446,6 +449,7 @@ const NEWROW = {
 function renderDelivery(editing){
   const d = editing ? edD : delv;
   $('#d-notice').innerHTML = ml(d.notice||'');
+  $('#d-synced').textContent = (localStorage.getItem(TOKEN_KEY) && d.synced_at) ? '무역허브 갱신: ' + d.synced_at : '';
   const rows = d.rows.map((x,i)=>({x,i})).filter(({x}) => editing || ((dF==='all' || !x.done) && match(qd, [x.group,x.product,x.pi,x.due,x.actual,x.note])));
   let html = '', g = null;
   const toDt = s => { const n = normD(s); if (!n) return null; const [y,m,dd] = n.split('.').map(Number); return new Date(2000+y, m-1, dd); };
@@ -718,20 +722,86 @@ $('#editBtn').addEventListener('click', ()=>{
 });
 $('#syncBtn').addEventListener('click', ()=>{
   window.open('https://trade.egojinsvc.com/trade-purchase-orders', '_blank');
-  toast('열린 무역허브 탭에서 북마크바의 "키룬 PI 갱신"을 눌러주세요.', 7000);
+  toast('열린 무역허브 탭에서 북마크바의 "LONGFIT PI 갱신"을 눌러주세요. 매트 PI와 납기표가 함께 갱신돼요.', 8000);
 });
+async function getFileFresh(file, token){
+  const r = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${DIR}${file}?ref=main&t=${Date.now()}`, {headers:{Authorization:'Bearer '+token, Accept:'application/vnd.github.raw+json'}, cache:'no-store'});
+  if (!r.ok) throw new Error(`${file} 읽기 실패 (${r.status})`);
+  return r.json();
+}
+// 납기표를 무역허브 발주 목록(키룬) 기준으로 맞춤: 없는 PI 추가, 선적/입고 끝난 PI 완료, ETD를 공장 실제 납기에 반영(이전 값은 비고에 原交期), 설 전 출고 계획 출고일 = ETD
+function mergeDelivery(dv, hubList){
+  const yy = s => (s||'').length >= 10 ? s.slice(2,10).replace(/-/g,'.') : '';
+  const pref = pi => String(pi||'').replace(/-\d+$/,'');
+  const hub = new Map(hubList.filter(h=>h.pi).map(h=>[h.pi, h]));
+  const st = {add:[], done:[], etd:[], plan:0, missing:[]};
+  const rows = dv.rows;
+  for (const r of rows){
+    const h = hub.get(r.pi);
+    if (!h){ if (!r.done && r.pi) st.missing.push(r.pi); continue; }
+    if (r.done) continue;
+    if (h.stage === 'inbound' || h.shipped){ r.done = true; st.done.push(r.pi); continue; }
+    if (h.etd){
+      const e = yy(h.etd);
+      if (normD(r.actual) !== normD(e)){
+        const old = String(r.actual||'').trim();
+        if (old && old !== r.etd_sync && !String(r.note||'').includes('原交期: ' + old)) r.note = (r.note ? r.note + '\n' : '') + '原交期: ' + old;
+        r.actual = e; r.etd_sync = e; st.etd.push(r.pi);
+      }
+    }
+  }
+  const have = new Set(rows.map(r=>r.pi));
+  for (const h of hubList){
+    if (!h.pi || have.has(h.pi) || h.stage === 'inbound' || h.shipped) continue;
+    const sib = [...rows].reverse().find(r => pref(r.pi) === pref(h.pi));
+    const model = (String(h.product||'').match(/[A-Z]*\d+[A-Z0-9]*/g) || []).pop() || pref(h.pi).replace(/^EG-/,'');
+    const nr = {group: sib ? sib.group : model, product: sib ? sib.product : model, pi: h.pi, due: yy(h.ready), actual: h.etd ? yy(h.etd) : '', note: '', done: false, hl: false, images: []};
+    if (h.etd) nr.etd_sync = nr.actual;
+    let at = -1; rows.forEach((r,i)=>{ if (r.group === nr.group) at = i; });
+    if (at < 0) rows.push(nr); else rows.splice(at+1, 0, nr);
+    have.add(h.pi); st.add.push(h.pi);
+  }
+  for (const p of dv.plan || []){
+    const h = hub.get(p.pi);
+    if (h && h.etd){ const e = yy(h.etd); if (normD(p.date) !== normD(e)){ p.date = e; st.plan++; } }
+  }
+  if (st.plan){
+    const k = s => (normD(s) || '99.99.99');
+    dv.plan = dv.plan.map((p,i)=>({p,i})).sort((a,b)=> k(a.p.date).localeCompare(k(b.p.date)) || a.i - b.i).map(x=>x.p);
+  }
+  return st;
+}
 async function applySync(){
   const m = location.hash.match(/^#sync=(.+)$/); if (!m) return;
   history.replaceState(null, '', location.pathname + location.search);
   let payload;
   try { payload = JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(m[1]))))); } catch(e){ return toast('갱신 데이터를 읽지 못했어요', 5000); }
-  if (!payload || !Array.isArray(payload.lines)) return toast('갱신 데이터가 비어 있어요', 5000);
+  const hasL = payload && Array.isArray(payload.lines) && payload.lines.length > 0;
+  const hasD = payload && Array.isArray(payload.delivery) && payload.delivery.length > 0;
+  if (!hasL && !hasD) return toast('갱신 데이터가 비어 있어요', 5000);
   let token = localStorage.getItem(TOKEN_KEY);
   if (!token){ token = prompt('PI 갱신을 저장하려면 편집 키를 입력하세요 (관리자 전용)'); if (!token) return; localStorage.setItem(TOKEN_KEY, token.trim()); token = token.trim(); }
-  try { toast('PI 내역 저장 중...', 15000); await putFile('shipments.json', payload, token);
-    ships = payload; render(); $('#syncBtn').style.display = ''; $('#editBtn').style.display = '';
-    toast(`PI 갱신 완료: ${payload.lines.length}줄. 1~2분 뒤 모두에게 반영돼요.`, 5000);
-  } catch(err){ toast(err.message, 6000); }
+  const msg = [];
+  try {
+    if (hasL){
+      toast('매트 PI 내역 저장 중...', 15000);
+      const sp = {synced_at: payload.synced_at, source: payload.source, lines: payload.lines};
+      await putFile('shipments.json', sp, token); ships = sp; msg.push(`매트 PI ${sp.lines.length}줄`);
+    }
+    if (hasD){
+      toast('납기표 갱신 중...', 15000);
+      const fresh = await getFileFresh('delivery.json', token);
+      const nd = {notice:'', plan:[], ...fresh};
+      const st = mergeDelivery(nd, payload.delivery);
+      nd.updated = todayStr; nd.synced_at = payload.synced_at || '';
+      await putFile('delivery.json', nd, token); delv = nd;
+      msg.push(`납기표: 추가 ${st.add.length} · 완료 ${st.done.length} · ETD ${st.etd.length}${st.plan ? ' · 출고계획 ' + st.plan : ''}`);
+      if (st.missing.length) msg.push('무역허브에 없는 PI: ' + st.missing.join(', '));
+      console.log('[납기 갱신]', st);
+    }
+    render(); $('#syncBtn').style.display = ''; $('#editBtn').style.display = '';
+    toast(`갱신 완료: ${msg.join(' / ')}. 1~2분 뒤 모두에게 반영돼요.`, 10000);
+  } catch(err){ toast((msg.length ? '일부만 저장됨(' + msg.join(' / ') + '): ' : '') + err.message, 8000); }
 }
 render(); load().then(applySync);
 </script>

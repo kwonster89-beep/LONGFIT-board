@@ -89,6 +89,34 @@
   .notice:empty{display:none}
   td.late{color:var(--red);font-weight:700}
   .late-tag{font-size:11px;color:var(--red)}
+/* 납기표 A안 (깔끔 정리형) */
+body.editing .view-only{display:none}
+th.dA-l{text-align:left}
+#tb-d.dA td{text-align:left;padding:10px 14px;border-bottom:1px solid #eef1f5}
+#tb-d.dA td.num{font-variant-numeric:tabular-nums}
+#tb-d.dA tr.grpA td{background:#fafbfd;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:12px 14px}
+#tb-d.dA tr.grpA b{font-size:15px;color:var(--text)}
+#tb-d.dA tr.grpA .cnt{margin-left:8px;color:var(--sub);font-size:12px}
+#tb-d.dA tr.grpA .sum{float:right;font-size:12px;color:var(--sub)}
+#tb-d.dA tr.grpA .sum>span{margin-left:12px}
+#tb-d.dA tr.grpA .sum .r{color:var(--red);font-weight:700}
+#tb-d.dA tr.lateA td:first-child{box-shadow:inset 3px 0 0 var(--red)}
+#tb-d.dA .cn{display:inline;margin:0 0 0 3px}
+#tb-d.dA td.note .cn{display:inline}
+.dA .pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}
+.dA .pill .cn{font-weight:400;opacity:.85;color:inherit;font-size:12px}
+.dA .pill.late{background:#fde8e8;color:var(--red)}
+.dA .pill.ok{background:#e8eef8;color:var(--brand)}
+.dA .pill.early{background:#e6f4e7;color:#2e7d32}
+.dA .pill.tbd{background:#f0f2f5;color:#8592a0}
+.dA .pill.memo,.dA .pill.over{background:#fff4d6;color:#8a6d1a}
+.dA .pill.done{background:#eef6ee;color:#2e7d32}
+.dA .diff{color:var(--red);font-size:12px;font-weight:700;margin-left:6px;white-space:nowrap}
+.dA .diff.e{color:#2e7d32}
+.dA .dash{color:#b3bcc6}
+body.lang-both #tb-d.dA .diff .cn{display:none}
+body.lang-cn #tb-d.dA .cn{margin:0}
+body.lang-cn .dA .pill .cn{font-weight:700;opacity:1}
   .komemo{margin-top:4px;color:var(--brand);font-size:12px}
   img.thumb{width:64px;height:64px;object-fit:cover;border-radius:6px;border:1px solid var(--line);margin:4px 4px 0 0;cursor:zoom-in;vertical-align:top;background:#f0f3f8}
   .imgs{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;align-items:flex-start}
@@ -100,30 +128,41 @@
   .donebox{display:block;font-size:12px;white-space:nowrap;margin-bottom:6px} .donebox input{width:auto}
   .lb{position:fixed;inset:0;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center;z-index:20;cursor:zoom-out}
   .lb.on{display:flex} .lb img{max-width:94vw;max-height:92vh;border-radius:6px;background:#fff}
-  body:not([data-tab="stock"]) #syncBtn{display:none!important}
+  body:not([data-tab="stock"]):not([data-tab="delivery"]) #syncBtn{display:none!important}
+#syncBtn .lb-d{display:none} body[data-tab="delivery"] #syncBtn .lb-d{display:inline} body[data-tab="delivery"] #syncBtn .lb-s{display:none}
+.dsync{font-size:12px;color:var(--sub);white-space:nowrap}
+textarea.qf{width:100%;min-width:120px;font:inherit;font-size:13px;line-height:1.45;padding:6px 8px;border:1px solid #c9d6ee;border-radius:6px;background:#fbfcff;resize:vertical;color:var(--text)}
+textarea.qf:focus{outline:none;border-color:var(--brand);background:#fff}
+td.qchanged textarea.qf{border-color:#e0a100;background:#fffaf0}
+body.dquick #dqBtn{display:none}
+.qhint{font-size:12px;color:#8a6d1a;background:#fff8e1;border:1px solid #f1d48a;border-radius:8px;padding:7px 12px;margin-bottom:10px;display:none}
+body.dquick .qhint{display:block}
   @media (max-width:700px){ .stock{grid-template-columns:1fr} h1{font-size:18px} h1 small{display:block;margin:2px 0 0} .stat .v{font-size:18px} }
 </style>
 </head>
 <body class="lang-both">
 <header><div class="wrap">
   <h1>키룬 관리표 <small>云中飞管理表格</small></h1>
-  <div class="meta"><span class="ko">매트 재고·합포 기준표</span><span class="cn"> 地垫库存·配套标准</span> · <span class="ko">매트 PI 갱신</span><span class="cn"> 地垫PI更新</span>: <b id="synced">-</b></div>
+  <div class="meta"><span class="ko">납기·부속 신청·샘플·매트 현황</span><span class="cn"> 交期·配件申请·样品·地垫</span> · <span class="ko">매트 PI 갱신</span><span class="cn"> 地垫PI更新</span>: <b id="synced">-</b></div>
   <nav class="tabs" id="tabs">
-    <button data-v="stock" class="on">매트 재고 <span class="cn">地垫库存</span></button>
+    <button data-v="delivery" class="on">납기표 <span class="cn">交期表</span></button>
+    <button data-v="parts">부속 신청 <span class="cn">配件申请表</span></button>
+    <button data-v="samples">샘플 현황 <span class="cn">样品状况</span></button>
+    <button data-v="stock">매트 재고 <span class="cn">地垫库存</span></button>
     <button data-v="spec">합포 기준표 <span class="cn">配套标准</span></button>
   </nav>
 </div></header>
 
 <main class="wrap">
   <div class="editbar">
-    <b>편집 모드</b><span style="color:#8a6d1a">매트 재고·합포 기준표를 고친 뒤 저장하면 1~2분 뒤 모두에게 반영돼요. 매트 차감 묶음 칸을 비우면 자동 계산값으로 돌아가요.</span>
+    <b>편집 모드</b><span style="color:#8a6d1a">모든 탭(납기표·부속 신청·샘플·매트)을 고친 뒤 저장하면 1~2분 뒤 모두에게 반영돼요. 편집 중에는 완료된 행도 모두 보여요. 매트 차감 묶음 칸을 비우면 자동 계산값으로 돌아가요.</span>
     <span style="flex:1"></span>
     <button class="btn primary" id="save">저장</button>
     <button class="btn" id="cancel">취소</button>
   </div>
 
   <div class="toolbar">
-    <button class="btn primary owner-only" id="syncBtn" style="display:none">무역허브에서 PI 갱신</button>
+    <button class="btn primary owner-only" id="syncBtn" style="display:none"><span class="lb-s">무역허브에서 PI 갱신</span><span class="lb-d">무역허브에서 납기 갱신</span></button>
     <button class="btn owner-only" id="editBtn" style="display:none">✎ 편집</button>
     <span style="flex:1"></span>
     <div class="seg" id="lang">
@@ -131,8 +170,88 @@
     </div>
   </div>
 
+  <!-- 납기표 -->
+  <section class="view on" id="v-delivery">
+    <div class="notice" id="d-notice"></div>
+    <div class="toolbar">
+      <input class="search" id="qd" placeholder="상품·PI 검색 / 搜索产品·订单号">
+      <div class="seg" id="dfl"><button data-v="open" class="on">진행 중 进行中</button><button data-v="all">전체(완료 포함) 全部</button></div>
+      <button class="btn edit-only" id="addD">+ 행 추가</button>
+      <span class="dsync" id="d-synced"></span>
+      <button class="btn view-only" id="dqBtn">납기·비고 입력 填写交期·备注</button>
+      <span id="dqBar" style="display:none;gap:6px"><button class="btn primary" id="dqSave">저장 保存</button><button class="btn" id="dqCancel">취소 取消</button></span>
+    </div>
+    <div class="qhint"><span class="ko">공장 실제 납기와 비고만 고칠 수 있어요. 고친 칸은 노란색으로 표시되고, 저장을 눌러야 반영돼요.</span> <span class="cn">只能修改实际交期和备注。修改过的格子显示为黄色，点击“保存”后生效。</span></div>
+    <div class="tablebox"><table class="wide">
+      <thead><tr>
+        <th class="edit-only" style="text-align:left"><span class="ko">상품</span><span class="cn">产品名</span></th>
+        <th class="dA-l" style="width:200px">PI <span class="cn">订单号</span></th>
+        <th class="dA-l view-only" style="width:150px"><span class="ko">상태</span><span class="cn">状态</span></th>
+        <th class="dA-l" style="width:130px"><span class="ko">요청 납기</span><span class="cn">交期</span></th>
+        <th class="dA-l" style="width:210px"><span class="ko">공장 실제 납기</span><span class="cn">云中飞实际交期</span></th>
+        <th style="text-align:left"><span class="ko">비고</span><span class="cn">备注</span></th>
+        <th class="edit-only"></th>
+      </tr></thead>
+      <tbody id="tb-d" class="dA"></tbody>
+    </table></div>
+    <h2>설 전 출고 계획 <span class="cn">年前出货计划</span> <button class="btn edit-only" id="addPlan" style="margin-left:8px">+ 추가</button></h2>
+    <div class="tablebox"><table class="wide">
+      <thead><tr>
+        <th style="text-align:left"><span class="ko">상품</span><span class="cn">产品名</span></th>
+        <th>PI <span class="cn">订单号</span></th>
+        <th><span class="ko">모델</span><span class="cn">型号</span></th>
+        <th><span class="ko">출고일</span><span class="cn">出货日期</span></th>
+        <th style="text-align:left"><span class="ko">비고</span><span class="cn">备注</span></th>
+        <th class="edit-only"></th>
+      </tr></thead>
+      <tbody id="tb-plan"></tbody>
+    </table></div>
+  </section>
+
+  <!-- 부속 신청 -->
+  <section class="view" id="v-parts">
+    <div class="notice" id="p-notice"></div>
+    <div class="toolbar">
+      <input class="search" id="qp" placeholder="상품·부속 검색 / 搜索产品·配件">
+      <div class="seg" id="pfl"><button data-v="open" class="on">진행 중 进行中</button><button data-v="all">전체(완료 포함) 全部</button></div>
+      <button class="btn edit-only" id="addP">+ 행 추가</button>
+    </div>
+    <div class="tablebox"><table class="wide">
+      <thead><tr>
+        <th style="text-align:left"><span class="ko">상품</span><span class="cn">产品名</span></th>
+        <th style="text-align:left"><span class="ko">부속 내역</span><span class="cn">配件名</span></th>
+        <th><span class="ko">신청일</span><span class="cn">申请日期</span></th>
+        <th style="text-align:left"><span class="ko">진행 상황</span><span class="cn">进度</span></th>
+        <th style="text-align:left"><span class="ko">미발송·메모</span><span class="cn">未发/备注</span></th>
+        <th><span class="ko">사진</span><span class="cn">图片</span></th>
+        <th class="edit-only"></th>
+      </tr></thead>
+      <tbody id="tb-p"></tbody>
+    </table></div>
+  </section>
+
+  <!-- 샘플 현황 -->
+  <section class="view" id="v-samples">
+    <div class="toolbar">
+      <input class="search" id="qs" placeholder="샘플 검색 / 搜索样品">
+      <div class="seg" id="sfl"><button data-v="open" class="on">진행 중 进行中</button><button data-v="all">전체(완료 포함) 全部</button></div>
+      <button class="btn edit-only" id="addS">+ 행 추가</button>
+    </div>
+    <div class="tablebox"><table class="wide">
+      <thead><tr>
+        <th><span class="ko">사진</span><span class="cn">产品图</span></th>
+        <th style="text-align:left"><span class="ko">샘플</span><span class="cn">产品名</span></th>
+        <th><span class="ko">신청일</span><span class="cn">申请日期</span></th>
+        <th><span class="ko">준비일</span><span class="cn">准备日期</span></th>
+        <th style="text-align:left"><span class="ko">비고</span><span class="cn">备注</span></th>
+        <th class="edit-only"></th>
+      </tr></thead>
+      <tbody id="tb-s"></tbody>
+    </table></div>
+  </section>
+
   <!-- 매트 재고 -->
-  <section class="view on" id="v-stock">
+  <section class="view" id="v-stock">
     <div class="basebox" id="basebox" style="margin:0 0 12px">
       <div class="field">기준일 (이날 기준 공장 보유)<input type="date" id="b-date"></div>
       <div id="b-list" style="display:contents"></div>
@@ -247,9 +366,12 @@ async function fetchJSON(file){
   return null;
 }
 async function load(){
-  const [d, s, sh] = await Promise.all([fetchJSON('data.json'), fetchJSON('stock.json'), fetchJSON('shipments.json')]);
+  const [d, s, sh, dv, pa, sm] = await Promise.all([fetchJSON('data.json'), fetchJSON('stock.json'), fetchJSON('shipments.json'), fetchJSON('delivery.json'), fetchJSON('parts.json'), fetchJSON('samples.json')]);
   if (!d || !Array.isArray(d.items) || !d.items.length){ loadState = 'fail'; render(); return; }
   data = d; if (s && s.base) stock = s; if (sh && Array.isArray(sh.lines)) ships = sh;
+  if (dv && Array.isArray(dv.rows)) delv = {notice:'', plan:[], ...dv};
+  if (pa && Array.isArray(pa.rows)) parts = {notice:'', ...pa};
+  if (sm && Array.isArray(sm.rows)) samp = sm;
   loadState = 'ok'; render();
 }
 
@@ -299,11 +421,12 @@ function render(){
   if (loadState !== 'ok'){
     const msg = loadState === 'loading' ? '불러오는 중... / 加载中...' :
       '데이터를 불러오지 못했어요. 새로고침해 주세요. / 数据加载失败，请刷新页面。<br><button class="btn" onclick="location.reload()" style="margin-top:10px">새로고침 / 刷新</button>';
-    for (const id of ['#tb','#tb-ship','#tb-sent']) $(id).innerHTML = `<tr><td colspan="10" class="empty">${msg}</td></tr>`;
+    for (const id of ['#tb','#tb-ship','#tb-sent','#tb-d','#tb-plan','#tb-p','#tb-s']) $(id).innerHTML = `<tr><td colspan="10" class="empty">${msg}</td></tr>`;
     $('#stockCards').innerHTML = ''; return;
   }
   renderStock(items, st, editing);
   renderSpec(items, editing);
+  renderDelivery(editing); renderParts(editing); renderSamples(editing);
 }
 
 // ---------- 납기표 / 부속 신청 / 샘플 ----------
@@ -333,6 +456,74 @@ const NEWROW = {
   pr:()=>({product:'', parts:'', date:todayYY, status:'', note:'', ko:'', done:false, images:[]}),
   sr:()=>({product:'', date:todayYY, ready:'', note:'', done:false, images:[]})
 };
+const qta = (f, i, x) => { const v = (dq && dq[i] && dq[i][f] !== undefined) ? dq[i][f] : (x[f] || ''); return `<textarea class="qf" data-qf="${f}" data-qi="${i}" rows="${Math.min(6, Math.max(f==='note'?2:1, String(v).split('\n').length))}" placeholder="${f==='actual'?'26.12.31':''}">${esc(v)}</textarea>`; };
+function renderDelivery(editing){
+  const d = editing ? edD : delv;
+  $('#d-notice').innerHTML = ml(d.notice||'');
+  $('#d-synced').textContent = (localStorage.getItem(TOKEN_KEY) && d.synced_at) ? '무역허브 갱신: ' + d.synced_at : '';
+  const rows = d.rows.map((x,i)=>({x,i})).filter(({x}) => editing || ((dF==='all' || !x.done) && match(qd, [x.group,x.product,x.pi,x.due,x.actual,x.note])));
+  let html = '', g = null;
+  const toDt = s => { const n = normD(s); if (!n) return null; const [y,m,dd] = n.split('.').map(Number); return new Date(2000+y, m-1, dd); };
+  const tdy = toDt(todayYY);
+  const stOf = x => {
+    if (x.done) return {k:'done', ko:'완료', cn:'已完成'};
+    const due = toDt(x.due), act = toDt(x.actual);
+    if (act && due){ const df = Math.round((act-due)/86400000);
+      if (df > 0) return {k:'late', ko:'지연', cn:'延迟', d:df};
+      if (df < 0) return {k:'early', ko:'조기', cn:'提前', d:df};
+      return {k:'ok', ko:'확정', cn:'已确认', d:0}; }
+    if (act) return {k:'ok', ko:'확정', cn:'已确认'};
+    if (String(x.actual||'').trim()) return {k:'memo', ko:'확인 필요', cn:'待确认'};
+    if (due && tdy && due < tdy) return {k:'over', ko:'납기 경과', cn:'已过交期'};
+    return {k:'tbd', ko:'미회신', cn:'待回复'};
+  };
+  const bi = (ko, cn) => `<span class="ko">${ko}</span><span class="cn">${cn}</span>`;
+  const grpSum = {};
+  if (!editing) for (const {x} of rows){ const s = stOf(x), o = grpSum[x.group] || (grpSum[x.group] = {n:0, late:0, ok:0, tbd:0}); o.n++; if (s.k==='late') o.late++; else if (s.k==='ok'||s.k==='early') o.ok++; else if (s.k==='tbd') o.tbd++; }
+  for (const {x,i} of rows){
+    if (!editing && x.group !== g){ g = x.group; const o = grpSum[g];
+      html += `<tr class="grpA"><td colspan="7"><b>${esc(g||'-')}</b><span class="cnt">${o.n}${bi('건','个')}</span><span class="sum">${o.late?`<span class="r">${bi('지연','延迟')} ${o.late}</span>`:''}<span>${bi('확정','已确认')} ${o.ok}</span><span>${bi('미회신','待回复')} ${o.tbd}</span></span></td></tr>`; }
+    if (editing){ html += `<tr data-t="dr" data-i="${i}">
+      <td>${inp('group', x.group, '그룹(예: 704W 蓝牙)')}${inp('product', x.product, '상품')}</td><td>${inp('pi', x.pi, 'EG-...')}</td>
+      <td>${inp('due', x.due, '26.12.31')}</td><td>${ta('actual', x.actual)}</td><td>${ta('note', x.note)}${editImgs(x.images,'dr',i)}</td>
+      <td>${doneBox(x.done)}${delBtn('dr',i)}</td></tr>`; continue; }
+    const s = stOf(x);
+    const diff = s.k==='late' ? `<span class="diff">+${s.d}${bi('일','天')}</span>` : s.k==='early' ? `<span class="diff e">${s.d}${bi('일','天')}</span>` : '';
+    html += `<tr class="${x.done?'muted':''} ${s.k==='late'?'lateA':''}">
+      <td class="edit-only"></td><td class="code">${esc(x.pi)}</td><td><span class="pill ${s.k}">${bi(s.ko, s.cn)}</span></td><td class="num">${esc(x.due)}</td>
+      <td class="num${dq && dq[i] && dq[i].actual!==undefined?' qchanged':''}">${dq ? qta('actual', i, x) : (String(x.actual||'').trim() ? ml(x.actual) : '<span class="dash">—</span>') + diff}</td>
+      <td class="note ${x.hl?'hl':''}${dq && dq[i] && dq[i].note!==undefined?' qchanged':''}">${dq ? qta('note', i, x) : ml(x.note)}${thumbs(x.images)}</td><td class="edit-only"></td></tr>`;
+  }
+  $('#tb-d').innerHTML = html || EMPTY(6);
+  const pl = d.plan.map((x,i)=>({x,i})).filter(({x}) => editing || match(qd, [x.product,x.pi,x.model,x.date,x.note]));
+  $('#tb-plan').innerHTML = pl.map(({x,i}) => editing ? `<tr data-t="dp" data-i="${i}"><td>${inp('product',x.product)}</td><td>${inp('pi',x.pi)}</td><td>${inp('model',x.model)}</td><td>${inp('date',x.date,'26.12.31')}</td><td>${inp('note',x.note)}</td><td>${delBtn('dp',i)}</td></tr>` :
+    `<tr class="${x.hl?'hlrow':''}"><td class="name">${esc(x.product)}</td><td class="code">${esc(x.pi)}</td><td class="code">${esc(x.model)}</td><td><b>${esc(x.date)}</b></td><td class="note">${ml(x.note)}</td><td class="edit-only"></td></tr>`).join('') || EMPTY(6);
+}
+function renderParts(editing){
+  const d = editing ? edP : parts;
+  $('#p-notice').innerHTML = ml(d.notice||'');
+  let rows = d.rows.map((x,i)=>({x,i}));
+  if (!editing) rows = rows.filter(({x}) => (pF==='all' || !x.done) && match(qp, [x.product,x.parts,x.ko,x.date,x.status,x.note])).sort((a,b) => (a.x.done-b.x.done) || byDateDesc('date')(a,b));
+  else rows.sort(byDateDesc('date'));
+  $('#tb-p').innerHTML = rows.map(({x,i}) => editing ? `<tr data-t="pr" data-i="${i}">
+      <td>${inp('product',x.product,'상품')}</td><td>${ta('parts',x.parts,'[번호-부속명] 수량')}${inp('ko',x.ko,'한국어 메모')}</td>
+      <td>${inp('date',x.date,'26.12.31')}</td><td>${ta('status',x.status)}</td><td>${ta('note',x.note)}</td><td>${editImgs(x.images,'pr',i)}</td>
+      <td>${doneBox(x.done)}${delBtn('pr',i)}</td></tr>` : `<tr class="${x.done?'muted':''}">
+      <td class="name">${esc(x.product)}</td><td class="note">${ml(x.parts)}${x.ko?`<div class="komemo">${ml(x.ko)}</div>`:''}</td>
+      <td>${esc(x.date)}</td><td class="note">${ml(x.status)}${x.done?DONE_B:''}</td><td class="note ${x.hl?'hl':''}">${ml(x.note)}</td>
+      <td>${thumbs(x.images)}</td><td class="edit-only"></td></tr>`).join('') || EMPTY(7);
+}
+function renderSamples(editing){
+  const d = editing ? edS : samp;
+  let rows = d.rows.map((x,i)=>({x,i}));
+  if (!editing) rows = rows.filter(({x}) => (sF==='all' || !x.done) && match(qs, [x.product,x.date,x.ready,x.note])).sort((a,b) => (a.x.done-b.x.done) || byDateDesc('date')(a,b));
+  else rows.sort(byDateDesc('date'));
+  $('#tb-s').innerHTML = rows.map(({x,i}) => editing ? `<tr data-t="sr" data-i="${i}">
+      <td>${editImgs(x.images,'sr',i)}</td><td>${ta('product',x.product,'샘플명')}</td><td>${inp('date',x.date,'26.12.31')}</td><td>${inp('ready',x.ready)}</td><td>${ta('note',x.note)}</td>
+      <td>${doneBox(x.done)}${delBtn('sr',i)}</td></tr>` : `<tr class="${x.done?'muted':''}">
+      <td>${thumbs(x.images)}</td><td class="name"><span style="font-weight:600">${ml(x.product)}</span>${x.done?DONE_B:''}</td>
+      <td>${esc(x.date)}</td><td>${esc(x.ready)}</td><td class="note">${ml(x.note)}</td><td class="edit-only"></td></tr>`).join('') || EMPTY(6);
+}
 function shrinkImage(file){ return new Promise((res, rej) => { const im = new Image();
   im.onload = () => { const s = Math.min(1, 1400/Math.max(im.width, im.height)); const c = document.createElement('canvas');
     c.width = Math.round(im.width*s); c.height = Math.round(im.height*s); const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0,0,c.width,c.height); g.drawImage(im,0,0,c.width,c.height);
@@ -455,7 +646,15 @@ function renderSpec(items, editing){
 const segBind = (sel, fn) => $(sel).addEventListener('click', e=>{ const b=e.target.closest('button'); if(!b) return;
   [...$(sel).children].forEach(x=>x.classList.toggle('on', x===b)); fn(b.dataset.v); });
 segBind('#tabs', v=>{ document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on', s.id==='v-'+v)); document.body.dataset.tab = v; localStorage.setItem('longfitboard_tab', v); });
-document.body.dataset.tab = 'stock';
+document.body.dataset.tab = 'delivery';
+segBind('#dfl', v=>{ dF=v; render(); }); segBind('#pfl', v=>{ pF=v; render(); }); segBind('#sfl', v=>{ sF=v; render(); });
+$('#qd').addEventListener('input', e=>{ qd=e.target.value; render(); });
+$('#qp').addEventListener('input', e=>{ qp=e.target.value; render(); });
+$('#qs').addEventListener('input', e=>{ qs=e.target.value; render(); });
+$('#addD').addEventListener('click', ()=>addRow('dr'));
+$('#addPlan').addEventListener('click', ()=>addRow('dp'));
+$('#addP').addEventListener('click', ()=>addRow('pr'));
+$('#addS').addEventListener('click', ()=>addRow('sr'));
 segBind('#mat', v=>{ matF=v; render(); });
 segBind('#stf', v=>{ stF=v; render(); });
 segBind('#lang', v=>{ document.body.classList.remove('lang-both','lang-ko','lang-cn'); document.body.classList.add('lang-'+v); localStorage.setItem('longfitboard_lang', v); });
@@ -469,9 +668,10 @@ function startEdit(){
   if (loadState !== 'ok') return toast('데이터를 먼저 불러와야 해요');
   draft = JSON.parse(JSON.stringify(data.items)); sdraft = JSON.parse(JSON.stringify(stock));
   sdraft.base = sdraft.base || {}; sdraft.sent = sdraft.sent || []; sdraft.overrides = sdraft.overrides || {}; sdraft.closed = sdraft.closed || [];
+  edD = JSON.parse(JSON.stringify(delv)); edP = JSON.parse(JSON.stringify(parts)); edS = JSON.parse(JSON.stringify(samp));
   document.body.classList.add('editing'); render();
 }
-function stopEdit(){ draft = null; sdraft = null; document.body.classList.remove('editing'); render(); }
+function stopEdit(){ draft = null; sdraft = null; edD = null; edP = null; edS = null; document.body.classList.remove('editing'); render(); }
 $('#admin').addEventListener('click', ()=>{
   if (draft) return;
   if (!localStorage.getItem(TOKEN_KEY)){ const t = prompt('편집 키를 입력하세요 (관리자 전용)'); if (!t) return; localStorage.setItem(TOKEN_KEY, t.trim()); }
@@ -516,6 +716,9 @@ $('#save').addEventListener('click', async ()=>{
     const nextStock = {base_date: sdraft.base_date, base: sdraft.base, sent: sdraft.sent.filter(x=>x.date && Number(x.qty)), overrides: sdraft.overrides || {}, closed: sdraft.closed || []};
     if (JSON.stringify(nextData.items) !== JSON.stringify(data.items)) await putFile('data.json', nextData, token);
     if (JSON.stringify(nextStock) !== JSON.stringify(stock)) await putFile('stock.json', nextStock, token);
+    if (JSON.stringify(edD) !== JSON.stringify(delv)) { edD.updated = todayStr; await putFile('delivery.json', edD, token); delv = edD; }
+    if (JSON.stringify(edP) !== JSON.stringify(parts)) { edP.updated = todayStr; await putFile('parts.json', edP, token); parts = edP; }
+    if (JSON.stringify(edS) !== JSON.stringify(samp)) { edS.updated = todayStr; await putFile('samples.json', edS, token); samp = edS; }
     data = nextData; stock = nextStock; stopEdit(); toast('저장됐어요. 1~2분 뒤 모든 사람 화면에 반영돼요.', 4000);
   }catch(err){ toast(err.message, 5000); }
   finally{ $('#save').disabled = false; }
@@ -523,6 +726,7 @@ $('#save').addEventListener('click', async ()=>{
 // ---------- PI 갱신 (무역허브 북마크 버튼이 #sync= 로 데이터를 넘겨줌) ----------
 if (localStorage.getItem(TOKEN_KEY)) { $('#syncBtn').style.display = ''; $('#editBtn').style.display = ''; }
 $('#editBtn').addEventListener('click', ()=>{
+  if (dq) endDq();
   if (!draft) startEdit();
   if (!draft) return;
   window.scrollTo({top:0, behavior:'smooth'});
@@ -530,15 +734,114 @@ $('#editBtn').addEventListener('click', ()=>{
 });
 $('#syncBtn').addEventListener('click', ()=>{
   window.open('https://trade.egojinsvc.com/trade-purchase-orders', '_blank');
-  toast('열린 무역허브 탭에서 북마크바의 "LONGFIT PI 갱신"을 눌러주세요.', 8000);
+  toast('열린 무역허브 탭에서 북마크바의 "LONGFIT PI 갱신"을 눌러주세요. 매트 PI와 납기표가 함께 갱신돼요.', 8000);
 });
+// ---------- 납기·비고 빠른 입력 (편집 키가 있는 사람 누구나) ----------
+const DKEY = 'longfitboard_dkey';
+const editKey = () => localStorage.getItem(TOKEN_KEY) || localStorage.getItem(DKEY);
+async function checkKey(k){
+  try { const r = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}`, {headers:{Authorization:'Bearer '+k}, cache:'no-store'});
+    if (!r.ok) return false; const j = await r.json(); return !j.permissions || j.permissions.push !== false; } catch(e){ return false; }
+}
+function endDq(){ dq = null; document.body.classList.remove('dquick'); $('#dqBar').style.display = 'none'; render(); }
+document.addEventListener('input', e => {
+  const t = e.target; if (!dq || !t.dataset || t.dataset.qf === undefined) return;
+  (dq[t.dataset.qi] || (dq[t.dataset.qi] = {}))[t.dataset.qf] = t.value;
+  t.closest('td')?.classList.add('qchanged');
+});
+$('#dqBtn').addEventListener('click', async ()=>{
+  if (draft) return toast('편집 모드를 먼저 끝내주세요');
+  let k = editKey();
+  if (!k){
+    k = prompt('편집 키를 입력하세요\n请输入编辑密钥'); if (!k) return; k = k.trim();
+    toast('확인 중... / 验证中...', 8000);
+    if (!(await checkKey(k))) return toast('편집 키가 맞지 않아요 / 密钥不正确', 5000);
+    localStorage.setItem(DKEY, k);
+  }
+  dq = {}; document.body.classList.add('dquick'); $('#dqBar').style.display = 'inline-flex'; render();
+  toast('공장 실제 납기·비고를 고친 뒤 저장을 눌러주세요 / 修改后请点击保存', 5000);
+});
+$('#dqCancel').addEventListener('click', ()=>{
+  if (dq && Object.keys(dq).length && !confirm('저장하지 않은 내용이 사라져요. 취소할까요?\n未保存的内容将丢失，确定取消吗？')) return;
+  endDq();
+});
+$('#dqSave').addEventListener('click', async ()=>{
+  const k = editKey(); if (!k || !dq) return;
+  const ch = Object.entries(dq); if (!ch.length){ endDq(); return toast('바뀐 내용이 없어요 / 没有修改', 4000); }
+  const btn = $('#dqSave'); btn.disabled = true;
+  try {
+    toast('저장 중... / 保存中...', 15000);
+    const fresh = await getFileFresh('delivery.json', k);
+    const nd = {notice:'', plan:[], ...fresh}; let n = 0; const miss = [];
+    for (const [i, v] of ch){
+      const o = delv.rows[+i]; if (!o) continue;
+      const f = (nd.rows[+i] && nd.rows[+i].pi === o.pi) ? nd.rows[+i] : nd.rows.find(r => r.pi === o.pi && r.group === o.group);
+      if (!f){ miss.push(o.pi); continue; }
+      for (const key of ['actual','note']) if (v[key] !== undefined && v[key] !== (o[key] || '')){ f[key] = v[key]; n++; }
+    }
+    if (n){ nd.updated = todayStr; await putFile('delivery.json', nd, k); delv = nd; }
+    endDq();
+    toast(n ? `저장 완료 (${n}칸). 1~2분 뒤 모두에게 반영돼요. / 已保存，1~2分钟后所有人可见${miss.length ? ' / 저장 못 한 PI: ' + miss.join(', ') : ''}` : '바뀐 내용이 없어요 / 没有修改', 8000);
+  } catch(err){
+    if (/편집 키/.test(err.message)) localStorage.removeItem(DKEY);
+    toast(err.message, 7000);
+  } finally { btn.disabled = false; }
+});
+async function getFileFresh(file, token){
+  const r = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${DIR}${file}?ref=main&t=${Date.now()}`, {headers:{Authorization:'Bearer '+token, Accept:'application/vnd.github.raw+json'}, cache:'no-store'});
+  if (!r.ok) throw new Error(`${file} 읽기 실패 (${r.status})`);
+  return r.json();
+}
+// 납기표를 무역허브 발주 목록(키룬) 기준으로 맞춤: 없는 PI 추가, 선적/입고 끝난 PI 완료, ETD를 공장 실제 납기에 반영(이전 값은 비고에 原交期), 설 전 출고 계획 출고일 = ETD
+function mergeDelivery(dv, hubList){
+  const yy = s => (s||'').length >= 10 ? s.slice(2,10).replace(/-/g,'.') : '';
+  const pref = pi => String(pi||'').replace(/-\d+$/,'');
+  const hub = new Map(hubList.filter(h=>h.pi).map(h=>[h.pi, h]));
+  const st = {add:[], done:[], etd:[], plan:0, missing:[]};
+  const rows = dv.rows;
+  for (const r of rows){
+    const h = hub.get(r.pi);
+    if (!h){ if (!r.done && r.pi) st.missing.push(r.pi); continue; }
+    if (r.done) continue;
+    if (h.stage === 'inbound' || h.shipped){ r.done = true; st.done.push(r.pi); continue; }
+    if (h.etd){
+      const e = yy(h.etd);
+      if (normD(r.actual) !== normD(e)){
+        const old = String(r.actual||'').trim();
+        if (old && old !== r.etd_sync && !String(r.note||'').includes('原交期: ' + old)) r.note = (r.note ? r.note + '\n' : '') + '原交期: ' + old;
+        r.actual = e; r.etd_sync = e; st.etd.push(r.pi);
+      }
+    }
+  }
+  const have = new Set(rows.map(r=>r.pi));
+  for (const h of hubList){
+    if (!h.pi || have.has(h.pi) || h.stage === 'inbound' || h.shipped) continue;
+    const sib = [...rows].reverse().find(r => pref(r.pi) === pref(h.pi));
+    const model = (String(h.product||'').match(/[A-Z]*\d+[A-Z0-9]*/g) || []).pop() || pref(h.pi).replace(/^EG-/,'');
+    const nr = {group: sib ? sib.group : model, product: sib ? sib.product : model, pi: h.pi, due: yy(h.ready), actual: h.etd ? yy(h.etd) : '', note: '', done: false, hl: false, images: []};
+    if (h.etd) nr.etd_sync = nr.actual;
+    let at = -1; rows.forEach((r,i)=>{ if (r.group === nr.group) at = i; });
+    if (at < 0) rows.push(nr); else rows.splice(at+1, 0, nr);
+    have.add(h.pi); st.add.push(h.pi);
+  }
+  for (const p of dv.plan || []){
+    const h = hub.get(p.pi);
+    if (h && h.etd){ const e = yy(h.etd); if (normD(p.date) !== normD(e)){ p.date = e; st.plan++; } }
+  }
+  if (st.plan){
+    const k = s => (normD(s) || '99.99.99');
+    dv.plan = dv.plan.map((p,i)=>({p,i})).sort((a,b)=> k(a.p.date).localeCompare(k(b.p.date)) || a.i - b.i).map(x=>x.p);
+  }
+  return st;
+}
 async function applySync(){
   const m = location.hash.match(/^#sync=(.+)$/); if (!m) return;
   history.replaceState(null, '', location.pathname + location.search);
   let payload;
   try { payload = JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(m[1]))))); } catch(e){ return toast('갱신 데이터를 읽지 못했어요', 5000); }
   const hasL = payload && Array.isArray(payload.lines) && payload.lines.length > 0;
-  if (!hasL) return toast('갱신 데이터가 비어 있어요', 5000);
+  const hasD = payload && Array.isArray(payload.delivery) && payload.delivery.length > 0;
+  if (!hasL && !hasD) return toast('갱신 데이터가 비어 있어요', 5000);
   let token = localStorage.getItem(TOKEN_KEY);
   if (!token){ token = prompt('PI 갱신을 저장하려면 편집 키를 입력하세요 (관리자 전용)'); if (!token) return; localStorage.setItem(TOKEN_KEY, token.trim()); token = token.trim(); }
   const msg = [];
@@ -547,6 +850,17 @@ async function applySync(){
       toast('매트 PI 내역 저장 중...', 15000);
       const sp = {synced_at: payload.synced_at, source: payload.source, lines: payload.lines};
       await putFile('shipments.json', sp, token); ships = sp; msg.push(`매트 PI ${sp.lines.length}줄`);
+    }
+    if (hasD){
+      toast('납기표 갱신 중...', 15000);
+      const fresh = await getFileFresh('delivery.json', token);
+      const nd = {notice:'', plan:[], ...fresh};
+      const st = mergeDelivery(nd, payload.delivery);
+      nd.updated = todayStr; nd.synced_at = payload.synced_at || '';
+      await putFile('delivery.json', nd, token); delv = nd;
+      msg.push(`납기표: 추가 ${st.add.length} · 완료 ${st.done.length} · ETD ${st.etd.length}${st.plan ? ' · 출고계획 ' + st.plan : ''}`);
+      if (st.missing.length) msg.push('무역허브에 없는 PI: ' + st.missing.join(', '));
+      console.log('[납기 갱신]', st);
     }
     render(); $('#syncBtn').style.display = ''; $('#editBtn').style.display = '';
     toast(`갱신 완료: ${msg.join(' / ')}. 1~2분 뒤 모두에게 반영돼요.`, 10000);

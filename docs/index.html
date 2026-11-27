@@ -29,7 +29,8 @@
   .stat .k{font-size:12px;color:var(--sub)}
   .stat .v{font-size:22px;font-weight:700;margin-top:2px}
   .stat.eva .v{color:var(--eva)} .stat.tpe .v{color:var(--tpe)}
-  .stock{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}
+  table.spec2 td{padding:7px 10px} table.spec2 td.name{text-align:left}
+.stock{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}
   .scard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
   .scard .title{display:flex;align-items:center;gap:8px;font-weight:700}
   .scard .big{font-size:30px;font-weight:800;margin:8px 0 2px}
@@ -149,7 +150,6 @@ body.dquick .qhint{display:block}
     <button data-v="parts">부속 신청 <span class="cn">配件申请表</span></button>
     <button data-v="samples">샘플 현황 <span class="cn">样品状况</span></button>
     <button data-v="stock">매트 재고 <span class="cn">地垫库存</span></button>
-    <button data-v="spec">합포 기준표 <span class="cn">配套标准</span></button>
   </nav>
 </div></header>
 
@@ -261,6 +261,17 @@ body.dquick .qhint{display:block}
     <div class="hint"><span class="ko">계산(묶음 단위, 기구 1대 = 1묶음): 시작 수량 + 보낸 수량 − 선적일(ETD)이 잡힌(포장 끝난) PI의 기구 대수. "차감 끝" PI는 이미 시작 수량에 반영된 것으로 보고 빼지 않아요. 생산 중(선적일 미정) PI는 마지막 줄에서 미리 계산만 해요. PI 목록은 무역허브 발주 관리에 남아 있는(입고 완료 전) PI 중 기준일 이후 것만 가져와요.</span><span class="cn">计算（按套，每台一套）：期初数量 + 寄出数量 − 已定出货日（已包装）的PI台数。“已结清”的PI视为已计入期初数量，不再扣减。</span></div>
 
 
+    <h2>합포 기준표 <span class="cn">配套标准</span> <button class="btn edit-only" id="add" style="margin-left:8px">+ 행 추가</button></h2>
+    <div class="tablebox"><table class="spec2">
+      <thead><tr>
+        <th style="text-align:left"><span class="ko">상품명</span><span class="cn">产品名称</span></th>
+        <th><span class="ko">재질</span><span class="cn">材质</span></th>
+        <th><span class="ko">규격</span><span class="cn">规格</span></th>
+        <th><span class="ko">합포 수량</span><span class="cn">配套数量</span></th>
+        <th class="edit-only"></th>
+      </tr></thead>
+      <tbody id="tb"></tbody>
+    </table></div>
     <h2>보낸 기록 <span class="cn">寄出记录</span> <button class="btn edit-only" id="addSent" style="margin-left:8px">+ 추가</button></h2>
     <div class="tablebox"><table>
       <thead><tr>
@@ -297,34 +308,6 @@ body.dquick .qhint{display:block}
     </table></div>
   </section>
 
-  <!-- 합포 기준표 -->
-  <section class="view" id="v-spec">
-    <div class="stats">
-      <div class="stat"><div class="k">전체 상품 <span class="cn">全部型号</span></div><div class="v" id="s-all">-</div></div>
-      <div class="stat eva"><div class="k">EVA 매트 <span class="cn">EVA 垫子</span></div><div class="v" id="s-eva">-</div></div>
-      <div class="stat tpe"><div class="k">TPE 매트 <span class="cn">TPE 防滑垫</span></div><div class="v" id="s-tpe">-</div></div>
-    </div>
-    <div class="toolbar">
-      <input class="search" id="q" placeholder="코드·상품명 검색 / 搜索编码·产品名称">
-      <div class="seg" id="mat"><button data-v="" class="on">전체 全部</button><button data-v="EVA">EVA</button><button data-v="TPE">TPE</button></div>
-      <button class="btn edit-only" id="add">+ 행 추가</button>
-    </div>
-    <div class="tablebox"><table class="wide">
-      <thead><tr>
-        <th>No</th>
-        <th><span class="ko">어드민코드</span><span class="cn">产品编码</span></th>
-        <th style="text-align:left"><span class="ko">상품명</span><span class="cn">产品名称</span></th>
-        <th><span class="ko">카테고리</span><span class="cn">类别</span></th>
-        <th><span class="ko">매트 종류</span><span class="cn">垫子类型</span></th>
-        <th><span class="ko">재질</span><span class="cn">材质</span></th>
-        <th><span class="ko">규격</span><span class="cn">规格</span></th>
-        <th><span class="ko">합포 수량</span><span class="cn">配套数量</span></th>
-        <th><span class="ko">비고</span><span class="cn">备注</span></th>
-        <th class="edit-only"></th>
-      </tr></thead>
-      <tbody id="tb"></tbody>
-    </table></div>
-  </section>
 </main>
 <footer><span>EVA · TPE</span><a id="admin" title="관리">관리</a></footer>
 <div class="toast" id="toast"></div>
@@ -611,37 +594,20 @@ function renderStock(items, st, editing){
     </tr>`).join('');
 }
 function renderSpec(items, editing){
-  $('#s-all').textContent = data.items.length;
-  $('#s-eva').textContent = data.items.filter(i=>i.material==='EVA').length;
-  $('#s-tpe').textContent = data.items.filter(i=>i.material==='TPE').length;
-  const ql = q.trim().toLowerCase();
-  const rows = items.map((it,i)=>({it,i})).filter(({it}) => editing || (
-    (!matF || it.material===matF) &&
-    (!ql || [it.code,it.name_ko,it.name_cn,it.cat_ko,it.cat_cn,it.type_ko,it.type_cn].join(' ').toLowerCase().includes(ql))));
-  if (!rows.length){ $('#tb').innerHTML = '<tr><td colspan="10" class="empty">결과 없음 / 无结果</td></tr>'; return; }
-  $('#tb').innerHTML = rows.map(({it,i},n) => editing ? `
+  if (!items.length){ $('#tb').innerHTML = '<tr><td colspan="5" class="empty">결과 없음 / 无结果</td></tr>'; return; }
+  $('#tb').innerHTML = items.map((it,i) => editing ? `
     <tr data-i="${i}">
-      <td>${n+1}</td>
-      <td><input class="short" data-k="code" value="${esc(it.code)}"></td>
-      <td class="name"><input data-k="name_ko" value="${esc(it.name_ko)}" placeholder="상품명"><input data-k="name_cn" value="${esc(it.name_cn)}" placeholder="产品名称" style="margin-top:3px"></td>
-      <td><input data-k="cat_ko" value="${esc(it.cat_ko)}"><input data-k="cat_cn" value="${esc(it.cat_cn)}" style="margin-top:3px"></td>
-      <td><input data-k="type_ko" value="${esc(it.type_ko)}"><input data-k="type_cn" value="${esc(it.type_cn)}" style="margin-top:3px"></td>
+      <td class="name"><input data-k="name_ko" value="${esc(it.name_ko)}" placeholder="상품명"><input data-k="name_cn" value="${esc(it.name_cn)}" placeholder="产品名称" style="margin-top:3px"><input class="short" data-k="code" value="${esc(it.code)}" placeholder="어드민코드" style="margin-top:3px"></td>
       <td><select data-k="material">${['EVA','TPE','기타'].map(m=>`<option ${m===it.material?'selected':''}>${m}</option>`).join('')}</select></td>
       <td><input data-k="spec" value="${esc(it.spec)}"></td>
       <td><input class="short" type="number" min="0" data-k="qty" value="${esc(it.qty)}"></td>
-      <td><input data-k="note" value="${esc(it.note)}"></td>
       <td><button class="btn danger" data-del="${i}">삭제</button></td>
     </tr>` : `
     <tr>
-      <td>${n+1}</td>
-      <td class="code">${esc(it.code)}</td>
       <td class="name"><span class="ko">${esc(it.name_ko)}</span><span class="cn">${esc(it.name_cn)}</span></td>
-      <td><span class="ko">${esc(it.cat_ko)}</span><span class="cn">${esc(it.cat_cn)}</span></td>
-      <td><span class="ko">${esc(it.type_ko)}</span><span class="cn">${esc(it.type_cn)}</span></td>
       <td><span class="badge ${esc(it.material)}">${esc(it.material)}</span></td>
       <td>${esc(it.spec)}</td>
       <td class="q"><span class="qty">${esc(it.qty)}</span> <span class="ko">장</span><span class="cn">张</span></td>
-      <td style="text-align:left">${esc(it.note)}</td>
       <td class="edit-only"></td>
     </tr>`).join('');
 }
@@ -659,10 +625,8 @@ $('#addD').addEventListener('click', ()=>addRow('dr'));
 $('#addPlan').addEventListener('click', ()=>addRow('dp'));
 $('#addP').addEventListener('click', ()=>addRow('pr'));
 $('#addS').addEventListener('click', ()=>addRow('sr'));
-segBind('#mat', v=>{ matF=v; render(); });
 segBind('#stf', v=>{ stF=v; render(); });
 segBind('#lang', v=>{ document.body.classList.remove('lang-both','lang-ko','lang-cn'); document.body.classList.add('lang-'+v); localStorage.setItem('longfitboard_lang', v); });
-$('#q').addEventListener('input', e=>{ q=e.target.value; render(); });
 $('#q2').addEventListener('input', e=>{ q2=e.target.value; render(); });
 const savedLang = localStorage.getItem('longfitboard_lang'); if (savedLang) $(`#lang button[data-v="${savedLang}"]`)?.click();
 const savedTab = localStorage.getItem('longfitboard_tab'); if (savedTab) $(`#tabs button[data-v="${savedTab}"]`)?.click();

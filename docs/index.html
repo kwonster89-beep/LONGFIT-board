@@ -131,6 +131,12 @@ body.lang-cn .dA .pill .cn{font-weight:700;opacity:1}
   body:not([data-tab="stock"]):not([data-tab="delivery"]) #syncBtn{display:none!important}
 #syncBtn .lb-d{display:none} body[data-tab="delivery"] #syncBtn .lb-d{display:inline} body[data-tab="delivery"] #syncBtn .lb-s{display:none}
 .dsync{font-size:12px;color:var(--sub);white-space:nowrap}
+textarea.qf{width:100%;min-width:120px;font:inherit;font-size:13px;line-height:1.45;padding:6px 8px;border:1px solid #c9d6ee;border-radius:6px;background:#fbfcff;resize:vertical;color:var(--text)}
+textarea.qf:focus{outline:none;border-color:var(--brand);background:#fff}
+td.qchanged textarea.qf{border-color:#e0a100;background:#fffaf0}
+body.dquick #dqBtn{display:none}
+.qhint{font-size:12px;color:#8a6d1a;background:#fff8e1;border:1px solid #f1d48a;border-radius:8px;padding:7px 12px;margin-bottom:10px;display:none}
+body.dquick .qhint{display:block}
   @media (max-width:700px){ .stock{grid-template-columns:1fr} h1{font-size:18px} h1 small{display:block;margin:2px 0 0} .stat .v{font-size:18px} }
 </style>
 </head>
@@ -172,7 +178,10 @@ body.lang-cn .dA .pill .cn{font-weight:700;opacity:1}
       <div class="seg" id="dfl"><button data-v="open" class="on">진행 중 进行中</button><button data-v="all">전체(완료 포함) 全部</button></div>
       <button class="btn edit-only" id="addD">+ 행 추가</button>
       <span class="dsync" id="d-synced"></span>
+      <button class="btn view-only" id="dqBtn">납기·비고 입력 填写交期·备注</button>
+      <span id="dqBar" style="display:none;gap:6px"><button class="btn primary" id="dqSave">저장 保存</button><button class="btn" id="dqCancel">취소 取消</button></span>
     </div>
+    <div class="qhint"><span class="ko">공장 실제 납기와 비고만 고칠 수 있어요. 고친 칸은 노란색으로 표시되고, 저장을 눌러야 반영돼요.</span> <span class="cn">只能修改实际交期和备注。修改过的格子显示为黄色，点击“保存”后生效。</span></div>
     <div class="tablebox"><table class="wide">
       <thead><tr>
         <th class="edit-only" style="text-align:left"><span class="ko">상품</span><span class="cn">产品名</span></th>
@@ -422,6 +431,7 @@ function render(){
 
 // ---------- 납기표 / 부속 신청 / 샘플 ----------
 let delv = {notice:'', rows:[], plan:[]}, parts = {notice:'', rows:[]}, samp = {rows:[]};
+let dq = null; // 납기·비고 빠른 입력 (편집 키로 공장 실제 납기·비고만 수정)
 let edD = null, edP = null, edS = null, dF = 'open', pF = 'open', sF = 'open', qd = '', qp = '', qs = '';
 const todayYY = todayStr.slice(2).replace(/-/g,'.');
 const ml = s => esc(s).replace(/\n/g,'<br>');
@@ -446,6 +456,7 @@ const NEWROW = {
   pr:()=>({product:'', parts:'', date:todayYY, status:'', note:'', ko:'', done:false, images:[]}),
   sr:()=>({product:'', date:todayYY, ready:'', note:'', done:false, images:[]})
 };
+const qta = (f, i, x) => { const v = (dq && dq[i] && dq[i][f] !== undefined) ? dq[i][f] : (x[f] || ''); return `<textarea class="qf" data-qf="${f}" data-qi="${i}" rows="${Math.min(6, Math.max(f==='note'?2:1, String(v).split('\n').length))}" placeholder="${f==='actual'?'26.12.31':''}">${esc(v)}</textarea>`; };
 function renderDelivery(editing){
   const d = editing ? edD : delv;
   $('#d-notice').innerHTML = ml(d.notice||'');
@@ -480,8 +491,8 @@ function renderDelivery(editing){
     const diff = s.k==='late' ? `<span class="diff">+${s.d}${bi('일','天')}</span>` : s.k==='early' ? `<span class="diff e">${s.d}${bi('일','天')}</span>` : '';
     html += `<tr class="${x.done?'muted':''} ${s.k==='late'?'lateA':''}">
       <td class="edit-only"></td><td class="code">${esc(x.pi)}</td><td><span class="pill ${s.k}">${bi(s.ko, s.cn)}</span></td><td class="num">${esc(x.due)}</td>
-      <td class="num">${String(x.actual||'').trim() ? ml(x.actual) : '<span class="dash">—</span>'}${diff}</td>
-      <td class="note ${x.hl?'hl':''}">${ml(x.note)}${thumbs(x.images)}</td><td class="edit-only"></td></tr>`;
+      <td class="num${dq && dq[i] && dq[i].actual!==undefined?' qchanged':''}">${dq ? qta('actual', i, x) : (String(x.actual||'').trim() ? ml(x.actual) : '<span class="dash">—</span>') + diff}</td>
+      <td class="note ${x.hl?'hl':''}${dq && dq[i] && dq[i].note!==undefined?' qchanged':''}">${dq ? qta('note', i, x) : ml(x.note)}${thumbs(x.images)}</td><td class="edit-only"></td></tr>`;
   }
   $('#tb-d').innerHTML = html || EMPTY(6);
   const pl = d.plan.map((x,i)=>({x,i})).filter(({x}) => editing || match(qd, [x.product,x.pi,x.model,x.date,x.note]));
@@ -715,6 +726,7 @@ $('#save').addEventListener('click', async ()=>{
 // ---------- PI 갱신 (무역허브 북마크 버튼이 #sync= 로 데이터를 넘겨줌) ----------
 if (localStorage.getItem(TOKEN_KEY)) { $('#syncBtn').style.display = ''; $('#editBtn').style.display = ''; }
 $('#editBtn').addEventListener('click', ()=>{
+  if (dq) endDq();
   if (!draft) startEdit();
   if (!draft) return;
   window.scrollTo({top:0, behavior:'smooth'});
@@ -723,6 +735,57 @@ $('#editBtn').addEventListener('click', ()=>{
 $('#syncBtn').addEventListener('click', ()=>{
   window.open('https://trade.egojinsvc.com/trade-purchase-orders', '_blank');
   toast('열린 무역허브 탭에서 북마크바의 "LONGFIT PI 갱신"을 눌러주세요. 매트 PI와 납기표가 함께 갱신돼요.', 8000);
+});
+// ---------- 납기·비고 빠른 입력 (편집 키가 있는 사람 누구나) ----------
+const DKEY = 'longfitboard_dkey';
+const editKey = () => localStorage.getItem(TOKEN_KEY) || localStorage.getItem(DKEY);
+async function checkKey(k){
+  try { const r = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}`, {headers:{Authorization:'Bearer '+k}, cache:'no-store'});
+    if (!r.ok) return false; const j = await r.json(); return !j.permissions || j.permissions.push !== false; } catch(e){ return false; }
+}
+function endDq(){ dq = null; document.body.classList.remove('dquick'); $('#dqBar').style.display = 'none'; render(); }
+document.addEventListener('input', e => {
+  const t = e.target; if (!dq || !t.dataset || t.dataset.qf === undefined) return;
+  (dq[t.dataset.qi] || (dq[t.dataset.qi] = {}))[t.dataset.qf] = t.value;
+  t.closest('td')?.classList.add('qchanged');
+});
+$('#dqBtn').addEventListener('click', async ()=>{
+  if (draft) return toast('편집 모드를 먼저 끝내주세요');
+  let k = editKey();
+  if (!k){
+    k = prompt('편집 키를 입력하세요\n请输入编辑密钥'); if (!k) return; k = k.trim();
+    toast('확인 중... / 验证中...', 8000);
+    if (!(await checkKey(k))) return toast('편집 키가 맞지 않아요 / 密钥不正确', 5000);
+    localStorage.setItem(DKEY, k);
+  }
+  dq = {}; document.body.classList.add('dquick'); $('#dqBar').style.display = 'inline-flex'; render();
+  toast('공장 실제 납기·비고를 고친 뒤 저장을 눌러주세요 / 修改后请点击保存', 5000);
+});
+$('#dqCancel').addEventListener('click', ()=>{
+  if (dq && Object.keys(dq).length && !confirm('저장하지 않은 내용이 사라져요. 취소할까요?\n未保存的内容将丢失，确定取消吗？')) return;
+  endDq();
+});
+$('#dqSave').addEventListener('click', async ()=>{
+  const k = editKey(); if (!k || !dq) return;
+  const ch = Object.entries(dq); if (!ch.length){ endDq(); return toast('바뀐 내용이 없어요 / 没有修改', 4000); }
+  const btn = $('#dqSave'); btn.disabled = true;
+  try {
+    toast('저장 중... / 保存中...', 15000);
+    const fresh = await getFileFresh('delivery.json', k);
+    const nd = {notice:'', plan:[], ...fresh}; let n = 0; const miss = [];
+    for (const [i, v] of ch){
+      const o = delv.rows[+i]; if (!o) continue;
+      const f = (nd.rows[+i] && nd.rows[+i].pi === o.pi) ? nd.rows[+i] : nd.rows.find(r => r.pi === o.pi && r.group === o.group);
+      if (!f){ miss.push(o.pi); continue; }
+      for (const key of ['actual','note']) if (v[key] !== undefined && v[key] !== (o[key] || '')){ f[key] = v[key]; n++; }
+    }
+    if (n){ nd.updated = todayStr; await putFile('delivery.json', nd, k); delv = nd; }
+    endDq();
+    toast(n ? `저장 완료 (${n}칸). 1~2분 뒤 모두에게 반영돼요. / 已保存，1~2分钟后所有人可见${miss.length ? ' / 저장 못 한 PI: ' + miss.join(', ') : ''}` : '바뀐 내용이 없어요 / 没有修改', 8000);
+  } catch(err){
+    if (/편집 키/.test(err.message)) localStorage.removeItem(DKEY);
+    toast(err.message, 7000);
+  } finally { btn.disabled = false; }
 });
 async function getFileFresh(file, token){
   const r = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${DIR}${file}?ref=main&t=${Date.now()}`, {headers:{Authorization:'Bearer '+token, Accept:'application/vnd.github.raw+json'}, cache:'no-store'});

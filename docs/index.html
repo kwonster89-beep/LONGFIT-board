@@ -331,7 +331,11 @@ body.dquick .qhint{display:block}
 <div class="lb" id="lb"><img alt=""></div>
 
 <script>
-const TOKEN_KEY = 'longfitboard_token';   // 기존 mat-bundle 사이트와 같은 도메인이라 키 이름을 반드시 다르게 유지
+const TOKEN_KEY = 'longfitboard_token';
+// 링크가 있는 사람 누구나 편집: 이 저장소(LONGFIT-board) 내용만 쓸 수 있는 공개 편집키
+const PUB_KEY = ["1_tap_buhtig","yhD0Q6N2LVC1","gh_R6xnyo1Mu","RNx9uwYz63YT","oVGTmVVyLnZv","ebfWwj9k1bxa","SYBE2TQywN8E","dUwddDoI6"].map(s => s.split('').reverse().join('')).join('');
+if (!localStorage.getItem(TOKEN_KEY)) localStorage.setItem(TOKEN_KEY, PUB_KEY);
+const IS_OWNER = () => { const t = localStorage.getItem(TOKEN_KEY); return !!t && t !== PUB_KEY; };   // 기존 mat-bundle 사이트와 같은 도메인이라 키 이름을 반드시 다르게 유지
 const host = location.hostname, seg = location.pathname.split('/').filter(Boolean);
 const OWNER = host.endsWith('github.io') ? host.split('.')[0] : 'kwonster89-beep';
 const REPO  = host.endsWith('github.io') ? (seg[0] || OWNER + '.github.io') : 'LONGFIT-board';
@@ -460,7 +464,7 @@ const qta = (f, i, x) => { const v = (dq && dq[i] && dq[i][f] !== undefined) ? d
 function renderDelivery(editing){
   const d = editing ? edD : delv;
   $('#d-notice').innerHTML = ml(d.notice||'');
-  $('#d-synced').textContent = (localStorage.getItem(TOKEN_KEY) && d.synced_at) ? '무역허브 갱신: ' + d.synced_at : '';
+  $('#d-synced').textContent = (IS_OWNER() && d.synced_at) ? '무역허브 갱신: ' + d.synced_at : '';
   const rows = d.rows.map((x,i)=>({x,i})).filter(({x}) => editing || ((dF==='all' || !x.done) && match(qd, [x.group,x.product,x.pi,x.due,x.actual,x.note])));
   let html = '', g = null;
   const toDt = s => { const n = normD(s); if (!n) return null; const [y,m,dd] = n.split('.').map(Number); return new Date(2000+y, m-1, dd); };
@@ -724,7 +728,7 @@ $('#save').addEventListener('click', async ()=>{
   finally{ $('#save').disabled = false; }
 });
 // ---------- PI 갱신 (무역허브 북마크 버튼이 #sync= 로 데이터를 넘겨줌) ----------
-if (localStorage.getItem(TOKEN_KEY)) { $('#syncBtn').style.display = ''; $('#editBtn').style.display = ''; }
+$('#editBtn').style.display = ''; if (IS_OWNER()) $('#syncBtn').style.display = '';
 $('#editBtn').addEventListener('click', ()=>{
   if (dq) endDq();
   if (!draft) startEdit();

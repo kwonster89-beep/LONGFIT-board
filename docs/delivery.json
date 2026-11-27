@@ -66,7 +66,8 @@
       "note": "原交期: 26.11.30",
       "done": false,
       "hl": false,
-      "images": []
+      "images": [],
+      "etd_sync": "26.12.11"
     },
     {
       "group": "704W 蓝牙",
@@ -176,7 +177,8 @@
       "note": "原交期: 26.11.25",
       "done": false,
       "hl": false,
-      "images": []
+      "images": [],
+      "etd_sync": "26.11.30"
     },
     {
       "group": "503D 蓝牙",
@@ -517,7 +519,8 @@
       "note": "10月份得生产大货，最终样品得尽快发出\n带运动秀V3X模块（遮蔽罩）\n原交期: 11/26返工",
       "done": false,
       "hl": false,
-      "images": []
+      "images": [],
+      "etd_sync": "26.12.03"
     },
     {
       "group": "266R",
@@ -631,7 +634,8 @@
       "hl": false,
       "images": [
         "img/d-r83-c6-0.jpg"
-      ]
+      ],
+      "etd_sync": "26.11.27"
     },
     {
       "group": "Y171U",

@@ -1,6 +1,240 @@
 {
-  "updated": "2026-11-26",
   "notice": "交货日期请每天核实,如所要求的订单交货日期发生变动,请务必告知EGOJIN,以便及时应对",
+  "plan": [
+    {
+      "product": "겨울 발주 7068+704R",
+      "pi": "EG-7068WGFC704W-001",
+      "model": "BC31533B+BC25013",
+      "date": "26.11.27",
+      "note": "",
+      "hl": false
+    },
+    {
+      "product": "503D 蓝牙",
+      "pi": "EG-503D-003",
+      "model": "BC27024",
+      "date": "26.11.30",
+      "note": "",
+      "hl": false
+    },
+    {
+      "product": "950R 蓝牙",
+      "pi": "EG-950-001",
+      "model": "BC65543",
+      "date": "26.12.03",
+      "note": "",
+      "hl": false
+    },
+    {
+      "product": "겨울 발주 Y171U+704R",
+      "pi": "EG-Y171U704W-001",
+      "model": "BC99510+BC25013",
+      "date": "26.12.03",
+      "note": "",
+      "hl": false
+    },
+    {
+      "product": "P8\n蓝牙",
+      "pi": "EG-P8-001",
+      "model": "ST86325",
+      "date": "26.12.03",
+      "note": "",
+      "hl": false
+    },
+    {
+      "product": "266R",
+      "pi": "EG-266-017",
+      "model": "BC31533",
+      "date": "26.12.05",
+      "note": "不能延迟",
+      "hl": true
+    },
+    {
+      "product": "906R 防水布灰色 蓝牙",
+      "pi": "EG-906WGFC-050",
+      "model": "BC32513",
+      "date": "26.12.10",
+      "note": "",
+      "hl": false
+    },
+    {
+      "product": "906R 防水布灰色 蓝牙",
+      "pi": "EG-906WGFC-051",
+      "model": "BC32513",
+      "date": "26.12.10",
+      "note": "",
+      "hl": false
+    },
+    {
+      "product": "906R 防水布灰色 蓝牙",
+      "pi": "EG-906WGFC-052",
+      "model": "BC32513",
+      "date": "26.12.10",
+      "note": "",
+      "hl": false
+    },
+    {
+      "product": "906R 防水布灰色 蓝牙",
+      "pi": "EG-906WGFC-053",
+      "model": "BC32513",
+      "date": "26.12.10",
+      "note": "",
+      "hl": false
+    },
+    {
+      "product": "704W 蓝牙",
+      "pi": "EG-704W-018",
+      "model": "BC25013",
+      "date": "26.12.11",
+      "note": "",
+      "hl": false
+    },
+    {
+      "product": "704W 蓝牙",
+      "pi": "EG-704W-019",
+      "model": "BC25013",
+      "date": "26.12.15",
+      "note": "",
+      "hl": false
+    },
+    {
+      "product": "704W 蓝牙",
+      "pi": "EG-704W-020",
+      "model": "BC25013",
+      "date": "26.12.15",
+      "note": "",
+      "hl": false
+    },
+    {
+      "product": "704W 蓝牙",
+      "pi": "EG-704W-021",
+      "model": "BC25013",
+      "date": "26.12.15",
+      "note": "",
+      "hl": false
+    },
+    {
+      "product": "706防水布灰色 蓝牙",
+      "pi": "EG-706WGFC-002",
+      "model": "BC31593",
+      "date": "26.12.20",
+      "note": "",
+      "hl": false
+    },
+    {
+      "product": "253U",
+      "pi": "EG-253-004",
+      "model": "BC29010",
+      "date": "26.12.30",
+      "note": "",
+      "hl": false
+    },
+    {
+      "product": "Y174R",
+      "pi": "EG-174-059",
+      "model": "BC99513",
+      "date": "26.12.31",
+      "note": "",
+      "hl": false
+    },
+    {
+      "product": "R500",
+      "pi": "EG-500-103",
+      "model": "AW40833",
+      "date": "27.01.15",
+      "note": "",
+      "hl": false
+    },
+    {
+      "product": "704W 蓝牙",
+      "pi": "EG-704W-022",
+      "model": "BC25013",
+      "date": "27.01.20",
+      "note": "",
+      "hl": false
+    },
+    {
+      "product": "704W 蓝牙",
+      "pi": "EG-704W-023",
+      "model": "BC25013",
+      "date": "27.01.20",
+      "note": "",
+      "hl": false
+    },
+    {
+      "product": "704W 蓝牙",
+      "pi": "EG-704W-024",
+      "model": "BC25013",
+      "date": "27.01.20",
+      "note": "",
+      "hl": false
+    },
+    {
+      "product": "906R 防水布灰色 蓝牙",
+      "pi": "EG-906WGFC-054",
+      "model": "BC32513",
+      "date": "27.01.20",
+      "note": "",
+      "hl": false
+    },
+    {
+      "product": "906R 防水布灰色 蓝牙",
+      "pi": "EG-906WGFC-055",
+      "model": "BC32513",
+      "date": "27.01.20",
+      "note": "",
+      "hl": false
+    },
+    {
+      "product": "906R 防水布灰色 蓝牙",
+      "pi": "EG-906WGFC-056",
+      "model": "BC32513",
+      "date": "27.01.20",
+      "note": "",
+      "hl": false
+    },
+    {
+      "product": "906R 防水布灰色 蓝牙",
+      "pi": "EG-906WGFC-057",
+      "model": "BC32513",
+      "date": "27.01.20",
+      "note": "",
+      "hl": false
+    },
+    {
+      "product": "706防水布灰色 蓝牙",
+      "pi": "EG-706WGFC-003",
+      "model": "BC31593",
+      "date": "27.01.25",
+      "note": "",
+      "hl": false
+    },
+    {
+      "product": "503D 蓝牙",
+      "pi": "EG-503D-004",
+      "model": "BC27024",
+      "date": "27.01.30",
+      "note": "",
+      "hl": false
+    },
+    {
+      "product": "704HR",
+      "pi": "EG-704HR-006",
+      "model": "BC61523",
+      "date": "27.01.30",
+      "note": "",
+      "hl": false
+    },
+    {
+      "product": "Y171U",
+      "pi": "EG-171-051",
+      "model": "BC99510",
+      "date": "27.1.30",
+      "note": "",
+      "hl": false
+    }
+  ],
+  "updated": "2026-11-27",
   "rows": [
     {
       "group": "704W 蓝牙",
@@ -660,238 +894,5 @@
       "images": []
     }
   ],
-  "plan": [
-    {
-      "product": "겨울 발주 7068+704R",
-      "pi": "EG-7068WGFC704W-001",
-      "model": "BC31533B+BC25013",
-      "date": "26.11.27",
-      "note": "",
-      "hl": false
-    },
-    {
-      "product": "503D 蓝牙",
-      "pi": "EG-503D-003",
-      "model": "BC27024",
-      "date": "26.11.30",
-      "note": "",
-      "hl": false
-    },
-    {
-      "product": "950R 蓝牙",
-      "pi": "EG-950-001",
-      "model": "BC65543",
-      "date": "26.12.03",
-      "note": "",
-      "hl": false
-    },
-    {
-      "product": "겨울 발주 Y171U+704R",
-      "pi": "EG-Y171U704W-001",
-      "model": "BC99510+BC25013",
-      "date": "26.12.03",
-      "note": "",
-      "hl": false
-    },
-    {
-      "product": "P8\n蓝牙",
-      "pi": "EG-P8-001",
-      "model": "ST86325",
-      "date": "26.12.03",
-      "note": "",
-      "hl": false
-    },
-    {
-      "product": "266R",
-      "pi": "EG-266-017",
-      "model": "BC31533",
-      "date": "26.12.05",
-      "note": "不能延迟",
-      "hl": true
-    },
-    {
-      "product": "906R 防水布灰色 蓝牙",
-      "pi": "EG-906WGFC-050",
-      "model": "BC32513",
-      "date": "26.12.10",
-      "note": "",
-      "hl": false
-    },
-    {
-      "product": "906R 防水布灰色 蓝牙",
-      "pi": "EG-906WGFC-051",
-      "model": "BC32513",
-      "date": "26.12.10",
-      "note": "",
-      "hl": false
-    },
-    {
-      "product": "906R 防水布灰色 蓝牙",
-      "pi": "EG-906WGFC-052",
-      "model": "BC32513",
-      "date": "26.12.10",
-      "note": "",
-      "hl": false
-    },
-    {
-      "product": "906R 防水布灰色 蓝牙",
-      "pi": "EG-906WGFC-053",
-      "model": "BC32513",
-      "date": "26.12.10",
-      "note": "",
-      "hl": false
-    },
-    {
-      "product": "704W 蓝牙",
-      "pi": "EG-704W-018",
-      "model": "BC25013",
-      "date": "26.12.11",
-      "note": "",
-      "hl": false
-    },
-    {
-      "product": "704W 蓝牙",
-      "pi": "EG-704W-019",
-      "model": "BC25013",
-      "date": "26.12.15",
-      "note": "",
-      "hl": false
-    },
-    {
-      "product": "704W 蓝牙",
-      "pi": "EG-704W-020",
-      "model": "BC25013",
-      "date": "26.12.15",
-      "note": "",
-      "hl": false
-    },
-    {
-      "product": "704W 蓝牙",
-      "pi": "EG-704W-021",
-      "model": "BC25013",
-      "date": "26.12.15",
-      "note": "",
-      "hl": false
-    },
-    {
-      "product": "706防水布灰色 蓝牙",
-      "pi": "EG-706WGFC-002",
-      "model": "BC31593",
-      "date": "26.12.20",
-      "note": "",
-      "hl": false
-    },
-    {
-      "product": "253U",
-      "pi": "EG-253-004",
-      "model": "BC29010",
-      "date": "26.12.30",
-      "note": "",
-      "hl": false
-    },
-    {
-      "product": "Y174R",
-      "pi": "EG-174-059",
-      "model": "BC99513",
-      "date": "26.12.31",
-      "note": "",
-      "hl": false
-    },
-    {
-      "product": "R500",
-      "pi": "EG-500-103",
-      "model": "AW40833",
-      "date": "27.01.15",
-      "note": "",
-      "hl": false
-    },
-    {
-      "product": "704W 蓝牙",
-      "pi": "EG-704W-022",
-      "model": "BC25013",
-      "date": "27.01.20",
-      "note": "",
-      "hl": false
-    },
-    {
-      "product": "704W 蓝牙",
-      "pi": "EG-704W-023",
-      "model": "BC25013",
-      "date": "27.01.20",
-      "note": "",
-      "hl": false
-    },
-    {
-      "product": "704W 蓝牙",
-      "pi": "EG-704W-024",
-      "model": "BC25013",
-      "date": "27.01.20",
-      "note": "",
-      "hl": false
-    },
-    {
-      "product": "906R 防水布灰色 蓝牙",
-      "pi": "EG-906WGFC-054",
-      "model": "BC32513",
-      "date": "27.01.20",
-      "note": "",
-      "hl": false
-    },
-    {
-      "product": "906R 防水布灰色 蓝牙",
-      "pi": "EG-906WGFC-055",
-      "model": "BC32513",
-      "date": "27.01.20",
-      "note": "",
-      "hl": false
-    },
-    {
-      "product": "906R 防水布灰色 蓝牙",
-      "pi": "EG-906WGFC-056",
-      "model": "BC32513",
-      "date": "27.01.20",
-      "note": "",
-      "hl": false
-    },
-    {
-      "product": "906R 防水布灰色 蓝牙",
-      "pi": "EG-906WGFC-057",
-      "model": "BC32513",
-      "date": "27.01.20",
-      "note": "",
-      "hl": false
-    },
-    {
-      "product": "706防水布灰色 蓝牙",
-      "pi": "EG-706WGFC-003",
-      "model": "BC31593",
-      "date": "27.01.25",
-      "note": "",
-      "hl": false
-    },
-    {
-      "product": "503D 蓝牙",
-      "pi": "EG-503D-004",
-      "model": "BC27024",
-      "date": "27.01.30",
-      "note": "",
-      "hl": false
-    },
-    {
-      "product": "704HR",
-      "pi": "EG-704HR-006",
-      "model": "BC61523",
-      "date": "27.01.30",
-      "note": "",
-      "hl": false
-    },
-    {
-      "product": "Y171U",
-      "pi": "EG-171-051",
-      "model": "BC99510",
-      "date": "27.1.30",
-      "note": "",
-      "hl": false
-    }
-  ]
+  "synced_at": "2026-11-27 09:10 KST"
 }
